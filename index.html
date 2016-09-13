@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="bayesAB : bayesAB: Fast Bayesian Methods for AB Testing">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>bayesAB</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/FrankPortman/bayesAB">View on GitHub</a>
+
+          <h1 id="project_title">bayesAB</h1>
+          <h2 id="project_tagline">bayesAB: Fast Bayesian Methods for AB Testing</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/FrankPortman/bayesAB/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/FrankPortman/bayesAB/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="bayesab" class="anchor" href="#bayesab" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>bayesAB</h1>
+
+<p><a href="https://travis-ci.org/FrankPortman/bayesAB"><img src="https://travis-ci.org/FrankPortman/bayesAB.svg?branch=master" alt="Travis-CI Build Status"></a> <a href="https://codecov.io/gh/FrankPortman/bayesAB"><img src="https://codecov.io/gh/FrankPortman/bayesAB/branch/master/graph/badge.svg" alt="codecov"></a></p>
+
+<h2>
+<a id="fast-bayesian-methods-for-ab-testing" class="anchor" href="#fast-bayesian-methods-for-ab-testing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fast Bayesian Methods for AB Testing</h2>
+
+<p>bayesAB provides a suite of functions that allow the user to analyze A/B test
+data in a Bayesian framework. bayesAB is intended to be a drop-in replacement for
+common frequentist hypothesis test such as the t-test and chi-sq test.</p>
+
+<p>Bayesian methods provide several benefits over frequentist methods in the context of
+A/B tests - namely in interpretability. Instead of p-values you get direct
+probabilities on whether A is better than B (and by how much). Instead of point estimates
+your posterior distributions are parametrized random variables which can be summarized
+any number of ways. Bayesian tests are also immune to 'peeking' and are thus valid whenever 
+a test is stopped.</p>
+
+<p>The general bayesAB workflow is as follows:</p>
+
+<ul>
+<li>Decide how you want to parametrize your data (Poisson for counts of email submissions, Bernoulli for CTR on an ad, etc.)</li>
+<li>Use our helper functions to decide on priors for your data (<code>?bayesTest</code>)</li>
+<li>Fit a <code>bayesTest</code> object
+
+<ul>
+<li>Optional: Use <code>combine</code> to munge together several <code>bayesTest</code> objects together for an arbitrary / non-analytical target distribution</li>
+</ul>
+</li>
+<li>
+<code>print</code>, <code>plot</code>, and <code>summary</code> to interpret your results</li>
+</ul>
+
+<p>We also have unit tests so you know this shit is serious.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<div class="highlight highlight-source-r"><pre>install.packages(<span class="pl-s"><span class="pl-pds">"</span>devtools<span class="pl-pds">"</span></span>)
+<span class="pl-e">devtools</span><span class="pl-k">::</span>install_github(<span class="pl-s"><span class="pl-pds">"</span>frankportman/bayesAB<span class="pl-pds">"</span></span>, <span class="pl-v">build_vignettes</span> <span class="pl-k">=</span> <span class="pl-c1">TRUE</span>)</pre></div>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>For a more in-depth look please check the vignettes: <code>browseVignettes(package = "bayesAB")</code>.</p>
+
+<div class="highlight highlight-source-r"><pre>library(<span class="pl-smi">bayesAB</span>)
+
+<span class="pl-c"># Choose bernoulli test priors</span>
+plotBeta(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>)
+plotBeta(<span class="pl-c1">2</span>, <span class="pl-c1">3</span>)
+
+<span class="pl-c"># Choose normal test priors</span>
+plotNormal(<span class="pl-c1">6</span>, <span class="pl-c1">3</span>)
+plotInvGamma(<span class="pl-c1">12</span>, <span class="pl-c1">4</span>)
+
+<span class="pl-smi">A_binom</span><span class="pl-k">&lt;-</span> rbinom(<span class="pl-c1">100</span>, <span class="pl-c1">1</span>, .<span class="pl-c1">5</span>)
+<span class="pl-smi">B_binom</span> <span class="pl-k">&lt;-</span> rbinom(<span class="pl-c1">100</span>, <span class="pl-c1">1</span>, .<span class="pl-c1">6</span>)
+
+<span class="pl-smi">A_norm</span> <span class="pl-k">&lt;-</span> rnorm(<span class="pl-c1">100</span>, <span class="pl-c1">6</span>, <span class="pl-c1">1.5</span>)
+<span class="pl-smi">B_norm</span> <span class="pl-k">&lt;-</span> rnorm(<span class="pl-c1">100</span>, <span class="pl-c1">5</span>, <span class="pl-c1">2.5</span>)
+
+<span class="pl-c"># Fit bernoulli and normal tests</span>
+<span class="pl-smi">AB1</span> <span class="pl-k">&lt;-</span> bayesTest(<span class="pl-smi">A_binom</span>, <span class="pl-smi">B_binom</span>, 
+                 <span class="pl-v">priors</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">'</span>alpha<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>beta<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">1</span>), <span class="pl-v">distribution</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>bernoulli<span class="pl-pds">'</span></span>)
+<span class="pl-smi">AB2</span> <span class="pl-k">&lt;-</span> bayesTest(<span class="pl-smi">A_norm</span>, <span class="pl-smi">B_norm</span>, 
+                 <span class="pl-v">priors</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">'</span>m0<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">5</span>, <span class="pl-s"><span class="pl-pds">'</span>k0<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>s_sq0<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">3</span>, <span class="pl-s"><span class="pl-pds">'</span>v0<span class="pl-pds">'</span></span> <span class="pl-k">=</span> <span class="pl-c1">1</span>), <span class="pl-v">distribution</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>normal<span class="pl-pds">'</span></span>)
+
+print(<span class="pl-smi">AB1</span>)
+summary(<span class="pl-smi">AB1</span>)
+plot(<span class="pl-smi">AB1</span>)
+
+print(<span class="pl-smi">AB2</span>)
+summary(<span class="pl-smi">AB2</span>)
+plot(<span class="pl-smi">AB2</span>)
+
+<span class="pl-c"># Create a new variable that is the probability multiiplied by the </span>
+<span class="pl-c"># normally distributed variable (expected value of something)</span>
+<span class="pl-smi">AB3</span> <span class="pl-k">&lt;-</span> combine(<span class="pl-smi">AB1</span>, <span class="pl-smi">AB2</span>, <span class="pl-v">f</span> <span class="pl-k">=</span> `<span class="pl-k">*</span>`, <span class="pl-v">params</span> <span class="pl-k">=</span> c(<span class="pl-s"><span class="pl-pds">'</span>Probability<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Mu<span class="pl-pds">'</span></span>), <span class="pl-v">newName</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Expectation<span class="pl-pds">'</span></span>)
+
+print(<span class="pl-smi">AB3</span>)
+summary(<span class="pl-smi">AB3</span>)
+plot(<span class="pl-smi">AB3</span>)
+</pre></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">bayesAB maintained by <a href="https://github.com/FrankPortman">FrankPortman</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
