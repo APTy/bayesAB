@@ -1,0 +1,8 @@
+title: bayesAB
+description: "bayesAB: Fast Bayesian Methods for AB Testing"
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
